@@ -1,4 +1,12 @@
 # streamdisc
 Tiny cgi module to make non-encrypted DVD and BD content available over the network.
 
-Depends on videolan's libdvdread and libbluray.
+Dependencies:
+-libdvdread
+-libbluray
+-any cgi capable http server
+
+Optional:
+-libdvdcss
+-libaacs
+-libbdplus
