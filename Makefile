@@ -4,13 +4,13 @@ CFLAGS+=`pkg-config --cflags libbluray`
 LDFLAGS+=`pkg-config --libs dvdread`
 CFLAGS+=`pkg-config --cflags dvdread`
 
-all: streamdisc_cgi dumpdisc discinfo
+all: streamdisc_cgi streamdisc_server discinfo
 
 streamdisc_cgi: streamdisc_cgi.c readdisc.o
 	${CC} -Wall -o streamdisc_cgi streamdisc_cgi.c readdisc.o ${CFLAGS} ${LDFLAGS}
 
-dumpdisc: dumpdisc.c readdisc.o
-	${CC} -Wall -o dumpdisc dumpdisc.c readdisc.o ${CFLAGS} ${LDFLAGS}
+streamdisc_server: streamdisc_server.c readdisc.o
+	${CC} -Wall -o streamdisc_server streamdisc_server.c readdisc.o ${CFLAGS} ${LDFLAGS}
 
 discinfo: discinfo.c readdisc.o
 	${CC} -Wall -o discinfo discinfo.c readdisc.o ${CFLAGS} ${LDFLAGS}
