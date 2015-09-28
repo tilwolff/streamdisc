@@ -16,3 +16,20 @@
  * with streamdisc; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+ 
+ struct streamdisc_http_request_s{
+	char *method;         /* support GET and HEAD
+	                      */
+	char *base_url;     /* e.g. http://127.0.0.1/cgi-bin/streamdisc for cgi version, 
+	                              http://127.0.0.1 for standalone 
+	                      */
+	char *path_info;      /* for title listing:  /
+	                         for specific title: /titlexxxxx.[m2ts,vob] 
+	                         if empty, redirect to / 
+	                      */
+	char *http_range;     /* bytes=[xxx]-[yyy] */
+};
+
+typedef struct streamdisc_http_request_s* streamdisc_http_request;
+
+void streamdisc_serve(int /* fd*/, streamdisc_http_request, char* /*device path*/);

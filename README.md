@@ -1,5 +1,5 @@
 # streamdisc
-Tiny cgi module to make non-encrypted DVD and BD content available over the network.
+Tiny cgi module that makes non-encrypted DVD and BD content available over the network.
 
 Dependencies:
 - libdvdread
