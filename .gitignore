@@ -1,0 +1,5 @@
+# generated files etc
+*.o
+streamdisc_cgi
+streamdisc_server
+discinfo
