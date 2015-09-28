@@ -22,23 +22,25 @@
 #include <errno.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <pwd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 
 int main(int argc, char *argv[]){
 
         char* dev_path="/dev/sr0";
-
-	if (access(dev_path, F_OK) == -1)
+        int test_fd=open(dev_path, O_RDONLY);
+	if (test_fd == -1)
 		log_err_die(ERR_NODEV);
-
-	setenv("HOME","/tmp",0); // set HOME to temp folder IF IT IS NOT SET. This enables dvdcss etc. to use cache
+	close(test_fd);
 	
 	struct streamdisc_http_request_s req;
 	req.method=getenv("REQUEST_METHOD");
 	req.base_url=getenv("SCRIPT_NAME");
 	req.path_info=getenv("PATH_INFO");
 	req.http_range=getenv("HTTP_RANGE");
-	
 	
 	streamdisc_serve(STDOUT_FILENO, &req, dev_path); //never returns
 }
