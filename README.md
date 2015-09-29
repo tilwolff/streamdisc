@@ -1,10 +1,13 @@
 # streamdisc
-Tiny cgi module that makes non-encrypted DVD and BD content available over the network.
+Tiny application that makes non-encrypted DVD and BD content available over the network.
+
+Available as 
+- cgi module (streamdisc_cgi) integrating into an existing cgi capable web server, or as
+- standalone server (streamdisc_server).
 
 Dependencies:
 - libdvdread
 - libbluray
-- any cgi capable http server
 
 Optional:
 - libdvdcss
