@@ -4,7 +4,7 @@ CFLAGS+=`pkg-config --cflags libbluray`
 LDFLAGS+=`pkg-config --libs dvdread`
 CFLAGS+=`pkg-config --cflags dvdread`
 
-all: streamdisc_cgi streamdisc_server discinfo streamdisc.o
+all: streamdisc_cgi streamdisc_server discinfo
 
 streamdisc_cgi: streamdisc_cgi.c streamdisc.o readdisc.o
 	${CC} -Wall -o streamdisc_cgi streamdisc_cgi.c streamdisc.o readdisc.o ${CFLAGS} ${LDFLAGS}
@@ -23,4 +23,4 @@ readdisc.o: readdisc.c readdisc.h
 
 .PHONY: clean
 clean:
-	rm -rf dumpdisc discinfo streamdisc_cgi readdisc.o 
+	rm -rf discinfo streamdisc_cgi streamdisc_server streamdisc.o readdisc.o 
