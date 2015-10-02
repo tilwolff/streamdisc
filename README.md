@@ -8,8 +8,3 @@ Available as
 Dependencies:
 - libdvdread
 - libbluray
-
-Optional:
-- libdvdcss
-- libaacs
-- libbdplus
