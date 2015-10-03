@@ -36,7 +36,7 @@ struct {
     { ERR_READBD, "Could not read BD title." },
     { ERR_READ, "Could not read from disc." },
     { ERR_FILEACCESS, "Could not open file." },
-    { ERR_FILEWRITE, "Could not write to file." },
+    { ERR_FILEWRITE, "Could not write to output stream." },
     { ERR_NODISC, "No disc has been opened." },
     { ERR_NO_TITLE_SELECTED, "No title has been selected." },
     { ERR_SIGNALS, "Could not register signal handler." },
@@ -276,13 +276,13 @@ char* err2msg(int err_code)
 	return default_msg;
 }
 
+void remove_log_file(){
+        unlink(STREAMDISC_LOG_PATH);
+}
+
 void log_msg(char* msg){
         /*log files*/
-        /* first time: rename old logfile */
         static int first_time=1;
-        if (first_time){
-                unlink(STREAMDISC_LOG_PATH);
-        }
         int fd;
 
         if((fd = open(STREAMDISC_LOG_PATH, O_CREAT| O_WRONLY | O_APPEND,0644)) >= 0) {

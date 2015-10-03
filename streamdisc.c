@@ -45,7 +45,7 @@ void log_request(streamdisc_http_request req){
         const char *path_info=(req->path_info) ? req->path_info : non_def;
         const char *http_range=(req->http_range) ? req->http_range : non_def;
         
-        snprintf(buf,511,"Request received:\n--Method: %s\n--Base URL: %s\n--Path Info: %s\n--Range: %s\n",method,base_url,path_info,http_range);
+        snprintf(buf,511,"Request received and picked up by PID %i:\n--Method: %s\n--Base URL: %s\n--Path Info: %s\n--Range: %s\n",getpid(),method,base_url,path_info,http_range);
         log_msg(buf);
 }
 
@@ -278,8 +278,6 @@ int serve_title(int fd,off64_t range_start, off64_t range_end){
 		}
 		bytes_total-=bytes_read;
 		offset+=bytes_read;
-
-
 	}
 	free(tmpbuf);
 	return ERR_OK;

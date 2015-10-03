@@ -98,6 +98,7 @@ off64_t read_bytes( disc_device_t, off64_t, int, unsigned char * );
 
 char* err2msg(int);
 
+void remove_log_file();
 void log_msg(char*);
 void log_msg_die(char*);
 void log_err(int);

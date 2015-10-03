@@ -116,9 +116,9 @@ int main(int argc, char **argv)
 	int i, port, listenfd, socketfd;
 	pid_t pid;
 	socklen_t length;
-	static struct sockaddr_in cli_addr; /* static = initialised to zeros */
-	static struct sockaddr_in serv_addr; /* static = initialised to zeros */
-        static struct streamdisc_http_request_s req; /* static = initialised to zeros */
+	static struct sockaddr_in cli_addr;             /* static = initialised to zeros */
+	static struct sockaddr_in serv_addr;            /* static = initialised to zeros */
+        static struct streamdisc_http_request_s req;    /* static = initialised to zeros */
 
 	if( argc < 3  || argc > 3 || !strcmp(argv[1], "-?") ) {
 		(void)printf("Usage: streamdisc_server <port> <device>\n\n"
@@ -128,6 +128,7 @@ int main(int argc, char **argv)
 		exit(0);
 	}
         
+        remove_log_file();
         /* check if device file is accessilbe */
         int test_fd=open(argv[2], O_RDONLY); 
 	if (test_fd == -1){
