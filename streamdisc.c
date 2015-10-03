@@ -31,7 +31,7 @@
 
 int abort_requested=0;
 disc_device_t dd_disc;
-char buf[8192];
+char buf[512];
 
 void
 signal_callback_handler(int signum){
@@ -39,15 +39,14 @@ signal_callback_handler(int signum){
 }
 
 void log_request(streamdisc_http_request req){
-        const char* non_def="Not defined";
-        char *method=(req->method) ? req->method : non_def;
-        char *base_url=(req->base_url) ? req->base_url : non_def;
-        char *path_info=(req->path_info) ? req->path_info : non_def;
-        char *http_range=(req->http_range) ? req->http_range : non_def;
+        const char *non_def="Not defined";
+        const char *method=(req->method) ? req->method : non_def;
+        const char *base_url=(req->base_url) ? req->base_url : non_def;
+        const char *path_info=(req->path_info) ? req->path_info : non_def;
+        const char *http_range=(req->http_range) ? req->http_range : non_def;
         
-        char msg[512];
-        snprintf(msg,512,"Request received:\n--Method: %s\n--Base URL: %s\n--Path Info: %s\n--Range: %s\n",method,base_url,path_info,http_range);
-        log_msg(msg);
+        snprintf(buf,511,"Request received:\n--Method: %s\n--Base URL: %s\n--Path Info: %s\n--Range: %s\n",method,base_url,path_info,http_range);
+        log_msg(buf);
 }
 
 int init(int32_t title_number,char *device_path){
@@ -100,7 +99,7 @@ int get_range(const char* http_range, off64_t* start, off64_t* end){
 
 	if  isdigit(*pos){						//first value given, we are in the case bytes=nnn-[mmm]	
 		errno=0;
-		result=strtoull(pos,&pos,0);				//strtoull discards whitespace
+		result=strtoull(pos,(char**)&pos,0);				//strtoull discards whitespace
 		if (errno){ 
 			return -1;
 		}
@@ -157,7 +156,7 @@ void header_dirlisting(int fd){
 }
 
 void header_redirect_root(int fd, char *base_url){
-	sprintf(buf,"HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n",base_url);//location needs slash in the end in order to be interpreted as directory
+	snprintf(buf,511,"HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n",base_url);//location needs slash in the end in order to be interpreted as directory
 	write(fd,buf,strlen(buf));
 }
 
@@ -175,11 +174,11 @@ void header_title(int fd,off64_t range_start, off64_t range_end){
 	const char* tp_dvd="video/dvd";
 	const char* tp= STATUS_DVD==dd_disc->status ? tp_dvd : tp_bd;
 	if(range_start==0 && range_end==dd_disc->current_title_size-1){
-		sprintf(buf,"HTTP/1.1 200 OK\nContent-Type: %s\nContent-Length: %zd\nAccept-Ranges: bytes\n\n",tp,dd_disc->current_title_size);
+		snprintf(buf,511,"HTTP/1.1 200 OK\nContent-Type: %s\nContent-Length: %zd\nAccept-Ranges: bytes\n\n",tp,dd_disc->current_title_size);
 	}else if(range_start>dd_disc->current_title_size-1){
-		sprintf(buf,"HTTP/1.1 416 Requested range not satisfiable\n\n");
+		snprintf(buf,511,"HTTP/1.1 416 Requested range not satisfiable\n\n");
 	}else{
-		sprintf(buf,"HTTP/1.1 206 Partial content\nContent-Type:%s\nContent-Length: %zd\nAccept-Ranges: bytes\nContent-Range: %zd-%zd/%zd\n\n",\
+		snprintf(buf,511,"HTTP/1.1 206 Partial content\nContent-Type:%s\nContent-Length: %zd\nAccept-Ranges: bytes\nContent-Range: %zd-%zd/%zd\n\n",\
 		        tp,range_end-range_start+1,range_start,range_end,dd_disc->current_title_size);
 	}
 	write(fd,buf,strlen(buf));
@@ -232,7 +231,7 @@ void serve_dirlisting(int fd){
 			unit="G";
 		}
 		sprintf(fn,fn_pattern,i); //filename
-		sprintf(buf,DIRLISTING_ITEM,fn,fn,lm,sz,unit,tp); //html item
+		snprintf(buf,511,DIRLISTING_ITEM,fn,fn,lm,sz,unit,tp); //html item
 		write(fd,buf,strlen(buf));
 		i++;
 	}
@@ -262,19 +261,19 @@ int serve_title(int fd,off64_t range_start, off64_t range_end){
 	off64_t offset=range_start;
 	off64_t bytes_total=range_end-range_start+1;
 
-        unsigned char* buffer=malloc(intBufSizeBytes*sizeof(unsigned char));
+        unsigned char* tmpbuf=malloc(intBufSizeBytes*sizeof(unsigned char));
 	off64_t bytes_read=0;
 	off64_t bytes_to_read=0;
 	while(bytes_total>0 && 0==abort_requested){
 		bytes_to_read=(bytes_total>intBufSizeBytes)? intBufSizeBytes: bytes_total;	
-		bytes_read=read_bytes( dd_disc, offset, bytes_to_read, buffer );
+		bytes_read=read_bytes( dd_disc, offset, bytes_to_read, tmpbuf );
 		if(bytes_read<0){
-		        free(buffer);
+		        free(tmpbuf);
 			return ERR_READ;
 		}
 		
-		if(write(fd,buffer,bytes_read)!=(ssize_t)bytes_read){
-		        free(buffer);
+		if(write(fd,tmpbuf,bytes_read)!=(ssize_t)bytes_read){
+		        free(tmpbuf);
 			return ERR_FILEWRITE;
 		}
 		bytes_total-=bytes_read;
@@ -282,7 +281,7 @@ int serve_title(int fd,off64_t range_start, off64_t range_end){
 
 
 	}
-	free(buffer);
+	free(tmpbuf);
 	return ERR_OK;
 }
 
