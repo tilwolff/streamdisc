@@ -31,31 +31,21 @@
 
 #define BUFSIZE 8192
 
-void log_and_exit(char *msg){
-        char logbuffer[BUFSIZE];
-        int fd=STDERR_FILENO;
-
-        sprintf(logbuffer,"%s\nExiting.\n",msg);
-        //if((fd = open("streamdisc_server.log", O_CREAT| O_WRONLY | O_APPEND,0644)) >= 0) {
-		(void)write(fd,logbuffer,strlen(logbuffer));   
-	//	(void)close(fd);
-	//}
-        exit(-1);
-}
-
 void parse_request(int fd,streamdisc_http_request req){
 	long i=0, j=0, len=0;
 	static char buffer[BUFSIZE]; /* static so zero filled */
 	len =read(fd,buffer,BUFSIZE); 	/* read Web request in one go */
 	
 	if(len == 0 || len == -1) {	/* read failure stop now */
-		log_and_exit("Failed to read browser request");
+		log_msg("Failed to read browser request.");
+		return;                 /* req->method is still null, streamdisc_serve will throw error so we do not care here*/
 	}
-	if(len > 0 && len < BUFSIZE){	/* return code is valid chars */
+	if(len > 4 && len < BUFSIZE){	/* return code is valid chars. should contains at least "GET /"*/
 		buffer[len]=0; 		/* terminate the buffer */
 	}
 	else{
-	        return;                    /* req->method is still null, streamdisc_serve will throw error so we do not care here*/
+	        log_msg("Invalid browser request.");
+	        return;                 /* req->method is still null, streamdisc_serve will throw error so we do not care here*/
 	}
 	for(i=0;i<len;i++){	/* remove CF and LF characters */
 		if(buffer[i] == '\r' || buffer[i] == '\n'){
@@ -72,6 +62,7 @@ void parse_request(int fd,streamdisc_http_request req){
 		i=j=5;
 	}
 	else{
+	        log_msg("Invalid browser request.");
 	        return;
 	}
 
@@ -136,8 +127,9 @@ int main(int argc, char **argv)
 	"\tNo warranty given or implied.\n\n");
 		exit(0);
 	}
-
-        int test_fd=open(argv[2], O_RDONLY);
+        
+        /* check if device file is accessilbe */
+        int test_fd=open(argv[2], O_RDONLY); 
 	if (test_fd == -1){
 		log_err_die(ERR_NODEV);
 	}
@@ -146,61 +138,68 @@ int main(int argc, char **argv)
         
 	port = atoi(argv[1]);
 	if(port <= 0 || port >60000){
-		log_and_exit("Invalid port number specified (try 1->60000)");
+		(void)printf("Invalid port number specified (try 1->60000)\n");
+		exit(-1);
         }
         
-	/* Become deamon + unstopable and no zombies children (= no wait()) */
-	pid=fork();
-	if(pid != 0){
-	        fprintf(stderr,"Exiting with pid %i\n",getpid());fflush(stderr);
-	        exit( pid ); /* parent returns to shell */
-	}
-
-	fprintf(stderr,"streamdisc_server starting, pid:%d, port: %d.\n",getpid(),port);
-	(void)signal(SIGCHLD, SIG_IGN); /* ignore child death */
-	(void)signal(SIGHUP, SIG_IGN); /* ignore terminal hangups */
-	for(i=3;i<32;i++){
-	        (void)close(i); /* close open files */
-	}
-	(void)setpgrp();		/* break away from process group */
-	/* setup the network socket */
+        /* setup the network socket */
 	listenfd = socket(AF_INET, SOCK_STREAM,0);
 	if(listenfd <0){
-	        log_and_exit("Error setting up network socket");
+	        log_msg_die("Error setting up network socket.");
 	}
 
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
 	if(bind(listenfd, (struct sockaddr *)&serv_addr,sizeof(serv_addr)) <0){
-	        log_and_exit("Error binding to network socket");
+	        (void)close(listenfd);
+	        log_msg_die("Error binding to network socket.");
 	}
 		
 	if(listen(listenfd,64) <0){
-	        log_and_exit("Error listening on network socket");
+	        (void)close(listenfd);
+	        log_msg_die("Error listening on network socket.");
 	}
-	fprintf(stderr,"pid: %i,before the loop\n",getpid());
+        
+	/* Become deamon + unstopable and no zombies children (= no wait()) */
+	pid=fork();
+	if(pid != 0){
+	        exit( pid ); /* parent returns to shell */
+	}
+        
+        char* logbuf=malloc(128*sizeof(char));
+        snprintf(logbuf,127,"streamdisc_server starting, pid:%d, port: %d.\n",getpid(),port);
+	log_msg(logbuf);
+	free(logbuf);
+	
+	(void)signal(SIGCHLD, SIG_IGN); /* ignore child death */
+	(void)signal(SIGHUP, SIG_IGN); /* ignore terminal hangups */
+	for(i=0;i<32;i++){/* close open files */
+	        if (i!=listenfd){
+	                (void)close(i); 
+	        }
+	}
+	(void)setpgrp();		/* break away from process group */
+
 	while(1) {
-	        fprintf(stderr,"pid: %i,entered the loop\n",getpid());
 		length = sizeof(cli_addr);
 		socketfd = accept(listenfd, (struct sockaddr *)&cli_addr, &length);
-		fprintf(stderr,"pid: %i,socketfd: %i\n",getpid(),socketfd);
 		if(socketfd < 0){
-		        log_and_exit("Error accepting connection");
-		}
-		else{
-		        fprintf(stderr,"Here I am\n");fflush(stderr);
+		        (void)close(listenfd);
+		        log_msg_die("Error accepting connection.");
 		}
                 pid = fork();
 		if(pid < 0){
-		        log_and_exit("Error forking server process");
+		        (void)close(listenfd);
+		        log_msg_die("Error forking server process.");
 		}
 		else if(pid == 0) { 	/* child */
-
 			(void)close(listenfd);
 			parse_request(socketfd,&req);
-			fprintf(stderr,"Here I am after parse_request\n");fflush(stderr);
-			streamdisc_serve(socketfd, &req, argv[2]);/* never returns */
+			log_request(&req);
+			(void)streamdisc_serve(socketfd, &req, argv[2]); /* do not care about return value */
+			(void)close(socketfd);
+			exit(0);
 		} 
 		else { 	/* parent */
 			(void)close(socketfd);

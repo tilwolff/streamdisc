@@ -32,4 +32,6 @@
 
 typedef struct streamdisc_http_request_s* streamdisc_http_request;
 
-void streamdisc_serve(int /* fd*/, streamdisc_http_request, char* /*device path*/);
+int streamdisc_serve(int /* fd*/, streamdisc_http_request, char* /*device path*/);
+
+void log_request(streamdisc_http_request);

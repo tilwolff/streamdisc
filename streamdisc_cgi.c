@@ -36,13 +36,16 @@ int main(int argc, char *argv[]){
 		log_err_die(ERR_NODEV);
 	close(test_fd);
 	
+	/* get environment variables. streamdisc_serve will handle null strings adequately */
 	struct streamdisc_http_request_s req;
 	req.method=getenv("REQUEST_METHOD");
 	req.base_url=getenv("SCRIPT_NAME");
 	req.path_info=getenv("PATH_INFO");
 	req.http_range=getenv("HTTP_RANGE");
 	
-	streamdisc_serve(STDOUT_FILENO, &req, dev_path); //never returns
+	log_request(&req);
+	
+	return streamdisc_serve(STDOUT_FILENO, &req, dev_path);
 }
 
 	

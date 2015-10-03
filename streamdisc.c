@@ -38,6 +38,18 @@ signal_callback_handler(int signum){
 	abort_requested=1;
 }
 
+void log_request(streamdisc_http_request req){
+        const char* non_def="Not defined";
+        char *method=(req->method) ? req->method : non_def;
+        char *base_url=(req->base_url) ? req->base_url : non_def;
+        char *path_info=(req->path_info) ? req->path_info : non_def;
+        char *http_range=(req->http_range) ? req->http_range : non_def;
+        
+        char msg[512];
+        snprintf(msg,512,"Request received:\n--Method: %s\n--Base URL: %s\n--Path Info: %s\n--Range: %s\n",method,base_url,path_info,http_range);
+        log_msg(msg);
+}
+
 int init(int32_t title_number,char *device_path){
 	int intRetVal=ERR_FATAL;
 	dd_disc=get_device_object();
@@ -90,7 +102,6 @@ int get_range(const char* http_range, off64_t* start, off64_t* end){
 		errno=0;
 		result=strtoull(pos,&pos,0);				//strtoull discards whitespace
 		if (errno){ 
-			fprintf(stderr,"Error");
 			return -1;
 		}
 		*start=result;
@@ -192,7 +203,7 @@ void serve_dirlisting(int fd){
 	const char* tp_bd="video/MP2T";	
 	const char* tp_dvd="video/dvd";
 	const char* tp= STATUS_DVD==dd_disc->status ? tp_dvd : tp_bd;
-	/* last modified */
+	/* last modified, does not matter here but important for xbmc/kodi client to parse directory listing */
 	const char* lm="2000-Jan-01 00:00:00";
 
 	/* size */
@@ -276,68 +287,84 @@ int serve_title(int fd,off64_t range_start, off64_t range_end){
 }
 
  
-void streamdisc_serve(int fd, streamdisc_http_request req, char *device_path){
+int streamdisc_serve(int fd, streamdisc_http_request req, char *device_path){
         int intRetVal=ERR_OK;
 	int32_t title_number=0;
 	int get=0;
 	off64_t start=0;
 	off64_t end=0;
 
-	if(signal(SIGTERM, signal_callback_handler)==SIG_ERR || signal(SIGINT, signal_callback_handler)==SIG_ERR)
-		log_err_die(ERR_SIGNALS);
+	if(signal(SIGTERM, signal_callback_handler)==SIG_ERR || signal(SIGINT, signal_callback_handler)==SIG_ERR){
+	        log_err(ERR_SIGNALS);
+		return -1;
+	}
 
 
-	if(req->method==NULL || req->base_url==NULL){
-		fprintf(stderr,"Invalid request received: Request method or base url (e.g. cgi script url) undefined.\nExiting.\n");
-		exit(-1);
+	if(req->method==NULL){
+		log_msg("Invalid request received: Request method undefined.");
+		return -1;
+	}
+	
+	if(req->base_url==NULL){
+		log_msg("Invalid request received: Base url (e.g. cgi script url) undefined.");
+		return -1;
 	}
 
 	if(strcmp(req->method,"HEAD") && strcmp(req->method,"GET")){
 		header_unsupported(fd); //only support HEAD and GET
-		exit(0);
+		return 0;
 	}else if(0==strcmp(req->method,"GET")){
 		get=1;
 	}
 
 	if(req->path_info==NULL){
 		header_redirect_root(fd,req->base_url);
-		exit(0);
+		return 0;
 	}
 
 	if(!strcmp(req->path_info,"")){
 		header_redirect_root(fd,req->base_url);
-		exit(0);
+		return 0;
 	}
 
 
 	if(req->http_range){
 		if(0!=get_range(req->http_range,&start,&end)){
-			fprintf(stderr,"Invalid range request received: %s\nSending HTTP 400 Bad Request\n",req->http_range);
+			log_msg("Invalid range request received:");
+			log_msg(req->http_range);
+			log_msg("Sending HTTP 400 Bad Request.");
 			header_bad(fd);
-			exit(0);
+			return 0;
 		}
 	}
 
 	title_number=interpret_request(req->path_info); /* 0 for title listing, positive number for specific title, negative number for error*/
 	
 	if(0>title_number){
+	        log_msg("The requested page:");
+	        log_msg(req->path_info);
+	        log_msg("...was not found.");
 		header_notfound(fd);
 		if(get) serve_notfound(fd);
 	}
 	if(0<=title_number){
 		intRetVal=init(title_number,device_path);
 		if (intRetVal!=ERR_OK){
+		        log_err(intRetVal);
 			header_notfound(fd);
 			if(get) serve_notfound(fd);
-			exit(intRetVal);
+			return intRetVal;
 		}
 		if(0==title_number){
+			log_msg("Serving directory listing");
 			header_dirlisting(fd);
 			if(get) serve_dirlisting(fd);
 		}else{
+		        log_msg("Serving title:");
+	                log_msg(req->path_info);
 			header_title(fd,start,end);
 			if(get) intRetVal=serve_title(fd,start,end);
 		}
 	}
-	exit(intRetVal);
+	return intRetVal;
 }

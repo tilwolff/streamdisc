@@ -18,6 +18,7 @@
  */
 
 #define _LARGEFILE64_SOURCE
+#define STREAMDISC_LOG_PATH "/var/log/streamdisc.log"
 
 #include "readdisc.h"
 
@@ -25,20 +26,20 @@ struct {
     int value;
     char* name;
 } error_codes[] = {
-    { ERR_OK, "Everything is fine" },
-    { ERR_END, "There is nothing more to do" },
-    { ERR_NODEV, "Device node not accessible" },
-    { ERR_EMPTY, "No DVD or BD disc present in device" },
-    { ERR_DVDOPEN, "Cannot open DVD. Check if DVD present" },
-    { ERR_BDOPEN, "Cannot open BD. Check if BD present" },
-    { ERR_READDVD, "Could not read DVD title" },
-    { ERR_READBD, "Could not read BD title" },
-    { ERR_READ, "Could not read from disc" },
-    { ERR_FILEACCESS, "Could not open file" },
-    { ERR_FILEWRITE, "Could not write to file" },
-    { ERR_NODISC, "No disc has been opened" },
-    { ERR_NO_TITLE_SELECTED, "No title has been selected" },
-    { ERR_SIGNALS, "Could not register signal handler" },
+    { ERR_OK, "Everything is fine." },
+    { ERR_END, "There is nothing more to do." },
+    { ERR_NODEV, "Device node not accessible." },
+    { ERR_EMPTY, "No DVD or BD disc present in device." },
+    { ERR_DVDOPEN, "Cannot open DVD. Check if DVD present." },
+    { ERR_BDOPEN, "Cannot open BD. Check if BD present." },
+    { ERR_READDVD, "Could not read DVD title." },
+    { ERR_READBD, "Could not read BD title." },
+    { ERR_READ, "Could not read from disc." },
+    { ERR_FILEACCESS, "Could not open file." },
+    { ERR_FILEWRITE, "Could not write to file." },
+    { ERR_NODISC, "No disc has been opened." },
+    { ERR_NO_TITLE_SELECTED, "No title has been selected." },
+    { ERR_SIGNALS, "Could not register signal handler." },
     { ERR_FATAL, "A fatal unhandled error occurred." },
     { 0, 0 }
 };
@@ -271,17 +272,50 @@ char* err2msg(int err_code)
 			return error_codes[i].name;
 		}
 	}
-	char* default_msg="An unknown error occured";
+	char* default_msg="An unknown error occured.";
 	return default_msg;
 }
 
+void log_msg(char* msg){
+        /*log files*/
+        /* first time: rename old logfile */
+        static int first_time=1;
+        if (first_time){
+                unlink(STREAMDISC_LOG_PATH);
+        }
+        int fd;
+
+        if((fd = open(STREAMDISC_LOG_PATH, O_CREAT| O_WRONLY | O_APPEND,0644)) >= 0) {
+		(void)write(fd,msg,strlen(msg));
+		(void)write(fd,"\n",1);
+		(void)close(fd);
+	}
+	else{
+        	if(first_time) write(STDERR_FILENO,"Could not write to log file.\n",29);	
+	}
+
+	write(STDERR_FILENO,msg,strlen(msg));
+	write(STDERR_FILENO,"\n",1);
+        if(first_time) first_time=0;
+}
+
+void log_msg_die(char* msg){
+	 log_msg(msg);
+	 log_msg("Exiting.");
+	 exit(-1);
+}	
 
 void log_err_die(int err_code){
 	char* msg=err2msg(err_code);
-	fprintf(stderr,"%s\nExiting.\n",msg);
-	exit (err_code);
+        log_msg(msg);
+        log_msg("Exiting.");
+	exit(err_code);
 }
-	
 
+
+void log_err(int err_code){
+	char* msg=err2msg(err_code);
+        log_msg(msg);
+}
 
 
