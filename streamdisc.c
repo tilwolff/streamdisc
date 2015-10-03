@@ -290,12 +290,13 @@ int streamdisc_serve(int fd, streamdisc_http_request req, char *device_path){
 	int get=0;
 	off64_t start=0;
 	off64_t end=0;
-
+        
+        /*
 	if(signal(SIGTERM, signal_callback_handler)==SIG_ERR || signal(SIGINT, signal_callback_handler)==SIG_ERR){
 	        log_err(ERR_SIGNALS);
 		return -1;
 	}
-
+        */
 
 	if(req->method==NULL){
 		log_msg("Invalid request received: Request method undefined.");
