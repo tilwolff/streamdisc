@@ -167,13 +167,13 @@ int main(int argc, char **argv)
 	}
         
         char* logbuf=malloc(128*sizeof(char));
-        snprintf(logbuf,127,"streamdisc_server starting, pid:%d, port: %d.\n",getpid(),port);
+        snprintf(logbuf,127,"streamdisc_server starting, pid:%d, port: %d.",getpid(),port);
 	log_msg(logbuf);
 	free(logbuf);
 	
 	(void)signal(SIGCHLD, SIG_IGN); /* ignore child death */
 	(void)signal(SIGHUP, SIG_IGN);  /* ignore terminal hangups */
-	for(i=0;i<32;i++){              /* close open files */
+	for(i=0;i<32768;i++){              /* close open files */
 	        if (i!=listenfd) (void)close(i);
 	}
 	(void)setpgrp();		/* break away from process group */
