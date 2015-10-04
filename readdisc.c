@@ -157,7 +157,7 @@ int update_title_list(disc_device_t dd){
 			dd->title_sizes[i-1]=dvdstat.size;
 			i++;
 		}
-		dd->title_sizes=realloc(dd->title_sizes,i*sizeof(uint64_t));
+		dd->title_sizes=realloc(dd->title_sizes,i*sizeof(uint64_t)); // free unused part of memory
 		if (1==i) return ERR_READDVD;		
 		dd->titles_count=i-1;
 		return ERR_OK;
@@ -222,8 +222,8 @@ off64_t read_bytes(disc_device_t dd, off64_t bytes_offset, int bytes_to_read, un
 				return -ERR_READBD;
 			}
 			off64_t seek_offset=bytes_offset-(off64_t)seek_res;
-			//READ AND DISCARD OFFSET	
-			if (seek_offset>0){
+				
+			if (seek_offset>0){ //UNDERSEEK SITUATION. READ AND DISCARD OFFSET
 				tmpbuf=(unsigned char*)malloc(seek_offset*sizeof(unsigned char));
 				read_res=bd_read(dd->bd, tmpbuf, seek_offset);
 				free(tmpbuf);
@@ -232,7 +232,7 @@ off64_t read_bytes(disc_device_t dd, off64_t bytes_offset, int bytes_to_read, un
 				}
 			}
 		}
-		read_res=bd_read(dd->bd, buf, bytes_to_read); //READ WHAT IS REQUESTED
+		read_res=bd_read(dd->bd, buf, bytes_to_read); //READ WHAT IS REALLY REQUESTED
 		if(-1==read_res){
 			return -ERR_READBD;
 		}
@@ -272,8 +272,7 @@ char* err2msg(int err_code)
 			return error_codes[i].name;
 		}
 	}
-	char* default_msg="An unknown error occured.";
-	return default_msg;
+        return (char*) "An unknown error occured.";
 }
 
 void remove_log_file(){
@@ -281,7 +280,7 @@ void remove_log_file(){
 }
 
 void log_msg(char* msg){
-        /*log files*/
+        /*log to file and stderr*/
         static int first_time=1;
         int fd;
 

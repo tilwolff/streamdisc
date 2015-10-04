@@ -45,7 +45,7 @@ void log_request(streamdisc_http_request req){
         const char *path_info=(req->path_info) ? req->path_info : non_def;
         const char *http_range=(req->http_range) ? req->http_range : non_def;
         
-        snprintf(buf,511,"Request received and picked up by PID %i:\n--Method: %s\n--Base URL: %s\n--Path Info: %s\n--Range: %s\n",getpid(),method,base_url,path_info,http_range);
+        snprintf(buf,512,"Request received and picked up by PID %i:\n--Method: %s\n--Base URL: %s\n--Path Info: %s\n--Range: %s\n",getpid(),method,base_url,path_info,http_range);
         log_msg(buf);
 }
 
@@ -156,7 +156,7 @@ void header_dirlisting(int fd){
 }
 
 void header_redirect_root(int fd, char *base_url){
-	snprintf(buf,511,"HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n",base_url);//location needs slash in the end in order to be interpreted as directory
+	snprintf(buf,512,"HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n",base_url);//location needs slash in the end in order to be interpreted as directory
 	write(fd,buf,strlen(buf));
 }
 
@@ -174,11 +174,11 @@ void header_title(int fd,off64_t range_start, off64_t range_end){
 	const char* tp_dvd="video/dvd";
 	const char* tp= STATUS_DVD==dd_disc->status ? tp_dvd : tp_bd;
 	if(range_start==0 && range_end==dd_disc->current_title_size-1){
-		snprintf(buf,511,"HTTP/1.1 200 OK\nContent-Type: %s\nContent-Length: %zd\nAccept-Ranges: bytes\n\n",tp,dd_disc->current_title_size);
+		snprintf(buf,512,"HTTP/1.1 200 OK\nContent-Type: %s\nContent-Length: %zd\nAccept-Ranges: bytes\n\n",tp,dd_disc->current_title_size);
 	}else if(range_start>dd_disc->current_title_size-1){
-		snprintf(buf,511,"HTTP/1.1 416 Requested range not satisfiable\n\n");
+		snprintf(buf,512,"HTTP/1.1 416 Requested range not satisfiable\n\n");
 	}else{
-		snprintf(buf,511,"HTTP/1.1 206 Partial content\nContent-Type:%s\nContent-Length: %zd\nAccept-Ranges: bytes\nContent-Range: %zd-%zd/%zd\n\n",\
+		snprintf(buf,512,"HTTP/1.1 206 Partial content\nContent-Type:%s\nContent-Length: %zd\nAccept-Ranges: bytes\nContent-Range: %zd-%zd/%zd\n\n",\
 		        tp,range_end-range_start+1,range_start,range_end,dd_disc->current_title_size);
 	}
 	write(fd,buf,strlen(buf));
@@ -231,7 +231,7 @@ void serve_dirlisting(int fd){
 			unit="G";
 		}
 		sprintf(fn,fn_pattern,i); //filename
-		snprintf(buf,511,DIRLISTING_ITEM,fn,fn,lm,sz,unit,tp); //html item
+		snprintf(buf,512,DIRLISTING_ITEM,fn,fn,lm,sz,unit,tp); //html item
 		write(fd,buf,strlen(buf));
 		i++;
 	}
@@ -291,12 +291,12 @@ int streamdisc_serve(int fd, streamdisc_http_request req, char *device_path){
 	off64_t start=0;
 	off64_t end=0;
         
-        /*
+        /* 
 	if(signal(SIGTERM, signal_callback_handler)==SIG_ERR || signal(SIGINT, signal_callback_handler)==SIG_ERR){
 	        log_err(ERR_SIGNALS);
 		return -1;
 	}
-        */
+        */      
 
 	if(req->method==NULL){
 		log_msg("Invalid request received: Request method undefined.");

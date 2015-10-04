@@ -33,11 +33,12 @@
 
 void parse_request(int fd,streamdisc_http_request req){
 	long i=0, j=0, len=0;
-	static char buffer[BUFSIZE]; /* static so zero filled */
+	char* buffer=malloc(BUFSIZE*sizeof(char));
 	len =read(fd,buffer,BUFSIZE); 	/* read Web request in one go */
 	
 	if(len == 0 || len == -1) {	/* read failure stop now */
 		log_msg("Failed to read browser request.");
+		free(buffer);
 		return;                 /* req->method is still null, streamdisc_serve will throw error so we do not care here*/
 	}
 	if(len > 4 && len < BUFSIZE){	/* return code is valid chars. should contains at least "GET /"*/
@@ -45,9 +46,10 @@ void parse_request(int fd,streamdisc_http_request req){
 	}
 	else{
 	        log_msg("Invalid browser request.");
+       		free(buffer);
 	        return;                 /* req->method is still null, streamdisc_serve will throw error so we do not care here*/
 	}
-	for(i=0;i<len;i++){	/* remove CF and LF characters */
+	for(i=0;i<len;i++){	        /* remove CF and LF characters */
 		if(buffer[i] == '\r' || buffer[i] == '\n'){
 			buffer[i]=0;
 		}
@@ -63,12 +65,13 @@ void parse_request(int fd,streamdisc_http_request req){
 	}
 	else{
 	        log_msg("Invalid browser request.");
+	        free(buffer);
 	        return;
 	}
 
         
 	while(i<BUFSIZE) { /* null terminate after the second space to ignore extra stuff */
-		if(buffer[i] == ' ') { /* string is "GET URL " +lots of other stuff */
+		if(buffer[i] == ' ') { /* string is "GET URI " +lots of other stuff */
 			buffer[i] = 0;
 			break;
 		}
@@ -93,7 +96,6 @@ void parse_request(int fd,streamdisc_http_request req){
 
 	/* retrieve requested range */
 	while( j < len){
-	   
 	        /* moving to new line: look for pos with pos-1=null and pos!=null */
 	        if( 0!=buffer[j] || 0==buffer[j-1]){
         	        if( !strncmp(buffer+j,"Range: ",7)){
@@ -103,12 +105,8 @@ void parse_request(int fd,streamdisc_http_request req){
                 }
                 j++;
 	}
-	
-	
-	
-//req->http_range="";
-req->base_url="";
-if (req->http_range) fprintf(stderr,"PATH_INFO: %s\nMETHOD: %s\nBASE_URL: %s\nHTTP_RANGE: %s\n",req->path_info,req->method,req->base_url,req->http_range);
+        free(buffer);
+        req->base_url="";
 }
 
 int main(int argc, char **argv)
@@ -162,7 +160,7 @@ int main(int argc, char **argv)
 	        log_msg_die("Error listening on network socket.");
 	}
         
-	/* Become deamon + unstopable and no zombies children (= no wait()) */
+	/* Become deamon + unstoppable and no zombies children (= no wait()) */
 	pid=fork();
 	if(pid != 0){
 	        exit( pid ); /* parent returns to shell */
@@ -174,15 +172,13 @@ int main(int argc, char **argv)
 	free(logbuf);
 	
 	(void)signal(SIGCHLD, SIG_IGN); /* ignore child death */
-	(void)signal(SIGHUP, SIG_IGN); /* ignore terminal hangups */
-	for(i=0;i<32;i++){/* close open files */
-	        if (i!=listenfd){
-	                (void)close(i); 
-	        }
+	(void)signal(SIGHUP, SIG_IGN);  /* ignore terminal hangups */
+	for(i=0;i<32;i++){              /* close open files */
+	        if (i!=listenfd) (void)close(i);
 	}
 	(void)setpgrp();		/* break away from process group */
 
-	while(1) {
+	while(1){
 		length = sizeof(cli_addr);
 		socketfd = accept(listenfd, (struct sockaddr *)&cli_addr, &length);
 		if(socketfd < 0){
@@ -194,10 +190,10 @@ int main(int argc, char **argv)
 		        (void)close(listenfd);
 		        log_msg_die("Error forking server process.");
 		}
-		else if(pid == 0) { 	/* child */
+		else if(0==pid) { 	/* child. interpret request and serve if possible */
 			(void)close(listenfd);
 			parse_request(socketfd,&req);
-			log_request(&req);
+			//log_request(&req);
 			(void)streamdisc_serve(socketfd, &req, argv[2]); /* do not care about return value */
 			(void)close(socketfd);
 			exit(0);
