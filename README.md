@@ -1,5 +1,5 @@
 # streamdisc
-![streamdisc logo](/logo.png)
+
 Tiny application that makes non-encrypted DVD and BD content available over the network.
 
 Available as 
@@ -9,3 +9,5 @@ Available as
 Dependencies:
 - libdvdread
 - libbluray
+
+![streamdisc logo](/logo.png)
