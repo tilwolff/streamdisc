@@ -8,7 +8,7 @@ Available as
 
 Integrates perfectly into kodi/xbmc as it provides a http directory listing (see screenshots):
 
-- add source http://<ip-address>
+- add source http://ip-address
 ![add source](/add_source.png)
 
 - browse new source
