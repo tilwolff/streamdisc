@@ -7,7 +7,7 @@ Available as
 - standalone server (streamdisc_server).
 
 Stream non-encrypted DVD and Bluray content in your local network:
-- start server: streamdisc 80 /dev/sr0
+- start server: `streamdisc 80 /dev/sr0`
 - Point your browser the ip address of the server (see screenshots):
 ![browser](/browser.png)
 
