@@ -14,12 +14,12 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="logo.svg">
+   sodipodi:docname="logo.png">
   <defs
      id="defs4" />
   <sodipodi:namedview
      id="base"
-     pagecolor="#00ff00"
+     pagecolor="#f0f0f0"
      bordercolor="#666666"
      borderopacity="1.0"
      inkscape:pageopacity="1"
@@ -55,13 +55,47 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#483737;fill-opacity:1;stroke:none;font-family:Monospace;-inkscape-font-specification:Monospace"
-       x="6.2903214"
+       x="60.290321"
        y="1041.717"
        id="text3023"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3025"
-         x="6.2903214"
-         y="1041.717">&gt;&gt;streamdisc</tspan></text>
+         x="60.290321"
+         y="1041.717"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol">streamdisc</tspan></text>
+    <g
+       id="g3834">
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="translate(0,1002.3622)"
+         inkscape:connector-curvature="0"
+         id="path3046"
+         d="m 10,10 10,0 10,15 -10,0 z"
+         style="fill:#00ff00;fill-opacity:1;stroke:#00ff00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         id="path3046-8"
+         d="m 20,1042.3622 -10,0 10,-15 10,0 z"
+         style="fill:#00ff00;fill-opacity:1;stroke:#00ff00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(20.5,0.08064471)"
+       id="g3834-9">
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="translate(0,1002.3622)"
+         inkscape:connector-curvature="0"
+         id="path3046-4"
+         d="m 10,10 10,0 10,15 -10,0 z"
+         style="fill:#00ff00;fill-opacity:1;stroke:#00ff00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         id="path3046-8-1"
+         d="m 20,1042.3622 -10,0 10,-15 10,0 z"
+         style="fill:#00ff00;fill-opacity:1;stroke:#00ff00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
   </g>
 </svg>
