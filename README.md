@@ -1,5 +1,5 @@
 # streamdisc
-![streamdisc logo](/logo.svg)
+![streamdisc logo](/logo.png)
 Tiny application that makes non-encrypted DVD and BD content available over the network.
 
 Available as 
