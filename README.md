@@ -1,4 +1,4 @@
-# streamdisc
+![#streamdisc](/logo.png)
 
 Tiny linux application that makes non-encrypted DVD and BD content available over the network.
 
@@ -9,12 +9,14 @@ Tiny linux application that makes non-encrypted DVD and BD content available ove
 ## Build from source
 - download source tree via github
 - build with `make`.
-- depends on pkg-config to resolve build dependencies
+- depends on _pkg-config_ to resolve build dependencies
 - does not (yet) come with an automatic configure script or cross platform build system
-- dependencies are _libdvdread_ and _libbluray_
+- dependencies are 
+-- _libdvdread_ and 
+-- _libbluray_
 
 ## Usage
-# standalone server
+### standalone server
 - syntax is `streamdisc_server <port> <drive device file>`
 - example: `streamdisc_server 80 /dev/sr0`
 - make sure you have sufficient privileges to access the disc drive and port
@@ -22,7 +24,7 @@ Tiny linux application that makes non-encrypted DVD and BD content available ove
 -- with your browser: point you browser to `your.server.ip.address:port/` (see screenshots below)
 -- with kodi/xbmc: add a video or generic file source named _streamdisc_ with path `http://your.server.ip.address:port/` (see screenshots below)
 
-# cgi module
+### cgi module
 - with _busybox httpd_: 
 -- copy _streamdisc_cgi_ executable into `/your/webroot/cgi-bin/`
 -- busybox httpd treats files in that folder as cgi executables.
@@ -34,8 +36,8 @@ Tiny linux application that makes non-encrypted DVD and BD content available ove
 -- with your browser: point you browser to `your.local.ip.address:port/cgi-bin/streamdisc_cgi`
 -- with kodi/xbmc: add a video or generic file source named _streamdisc_ with path `http://your.local.ip.address:port/cgi-bin/streamdisc_cgi`
 
-# Screenshots
+## Screenshots
 ![browser](/browser.png)
 ![add source](/add_source.png)
 ![directory listing](/dir_listing.png)
-![streamdisc logo](/logo.png)
+
