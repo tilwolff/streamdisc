@@ -41,6 +41,7 @@ Tiny linux application that makes non-encrypted DVD and BD content available ove
 
 ## Screenshots
 ![browser](/browser.png)
+![browser](/browser_bd.png)
 ![add source](/add_source.png)
 ![directory listing](/dir_listing.png)
 
