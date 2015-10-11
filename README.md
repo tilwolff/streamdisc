@@ -24,7 +24,7 @@ Tiny linux application that makes non-encrypted DVD and BD content available ove
 - make sure you have sufficient privileges to access the disc drive and port
 - access disc
     - with your browser: point you browser to `your.server.ip.address:port/` (see screenshots below)
-    - with kodi/xbmc: add a video or generic file source named _streamdisc_ with path `http://your.server.ip.address:port/` (see screenshots below)
+    - with KODI/XBMC: add a video or generic file source named _streamdisc_ with path `http://your.server.ip.address:port/` (see screenshots below)
 
 ### cgi module
 - with _busybox httpd_: 
@@ -37,11 +37,30 @@ Tiny linux application that makes non-encrypted DVD and BD content available ove
     - configure lighttpd to treat files in that folder as cgi executables.
 - access disc
     - with your browser: point you browser to `your.local.ip.address:port/cgi-bin/streamdisc_cgi`
-    - with kodi/xbmc: add a video or generic file source named _streamdisc_ with path `http://your.local.ip.address:port/cgi-bin/streamdisc_cgi`
+    - with KODI/XBMC: add a video or generic file source named _streamdisc_ with path `http://your.local.ip.address:port/cgi-bin/streamdisc_cgi`
+
+## License
+streamdisc is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+streamdisc is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+## Credits
+A significant part of the code for the standalone streamdisc_server was taken from [nweb](http://www.ibm.com/developerworks/systems/library/es-nweb/).
 
 ## Screenshots
+### DVD content in web browser
 ![browser](/browser.png)
+
+### BluRay content in web browser
 ![browser](/browser_bd.png)
+
+### Integration in KODI/XBMC media center
 ![add source](/add_source.png)
 ![directory listing](/dir_listing.png)
 
