@@ -14,8 +14,6 @@ Tiny linux server application making non-encrypted DVD and BD content available 
     - _libdvdread_ 
     - _libbluray_
 
-streamdisc does not (yet) come with an automatic configure script or cross platform build system
-
 ## Usage
 ### General
 - both _streamdisc_cgi_ and _streamdisc_server_ log to both _stderr_ and _/var/log/streamdisc.log_ (if that file is writable by the user).
