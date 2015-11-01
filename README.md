@@ -1,4 +1,4 @@
-![#streamdisc](/logo.png)
+![#streamdisc](pics/logo.png)
 
 Tiny linux server application making non-encrypted DVD and BD content available over the network.
 
