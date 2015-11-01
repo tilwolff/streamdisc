@@ -8,8 +8,8 @@ Tiny linux server application making non-encrypted DVD and BD content available 
 
 ## Building from source
 - download source code via git
+- run `./configure`
 - build with `make`.
-- static Makefile uses _pkg-config_ to resolve build dependencies
 - dependencies are 
     - _libdvdread_ 
     - _libbluray_
