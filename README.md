@@ -57,12 +57,12 @@ A significant part of the code for the standalone streamdisc_server was taken fr
 
 ## Screenshots
 ### DVD content in web browser
-![browser](/browser.png)
+![browser](pics/browser.png)
 
 ### BluRay content in web browser
-![browser](/browser_bd.png)
+![browser](pics/browser_bd.png)
 
 ### Integration in KODI/XBMC media center
-![add source](/add_source.png)
-![directory listing](/dir_listing.png)
+![add source](pics/add_source.png)
+![directory listing](pics/dir_listing.png)
 
