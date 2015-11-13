@@ -103,5 +103,6 @@ void log_msg(char*);
 void log_msg_die(char*);
 void log_err(int);
 void log_err_die(int);
+void set_log(int, int);
 #endif
 

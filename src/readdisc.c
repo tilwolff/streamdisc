@@ -22,6 +22,9 @@
 
 #include "readdisc.h"
 
+int log_to_stderr=1;
+int log_to_file=1;
+
 struct {
     int value;
     char* name;
@@ -280,22 +283,25 @@ void remove_log_file(){
 }
 
 void log_msg(char* msg){
-        /*log to file and stderr*/
-        static int first_time=1;
-        int fd;
-
-        if((fd = open(STREAMDISC_LOG_PATH, O_CREAT| O_WRONLY | O_APPEND,0644)) >= 0) {
-		(void)write(fd,msg,strlen(msg));
-		(void)write(fd,"\n",1);
-		(void)close(fd);
-	}
-	else{
-        	if(first_time) write(STDERR_FILENO,"Could not write to log file.\n",29);	
-	}
-
-	write(STDERR_FILENO,msg,strlen(msg));
-	write(STDERR_FILENO,"\n",1);
-        if(first_time) first_time=0;
+        
+        /*log to stderr*/
+        if(log_to_stderr){
+	        write(STDERR_FILENO,msg,strlen(msg));
+	        write(STDERR_FILENO,"\n",1);
+        }
+        
+        /*log to file */ 
+        if(log_to_file){
+                int fd;
+                if((fd = open(STREAMDISC_LOG_PATH, O_CREAT| O_WRONLY | O_APPEND,0644)) >= 0) {
+		        (void)write(fd,msg,strlen(msg));
+		        (void)write(fd,"\n",1);
+		        (void)close(fd);
+	        }
+	        else if(log_to_stderr){
+                	write(STDERR_FILENO,"Could not write to log file.\n",29);	
+	        }
+        }
 }
 
 void log_msg_die(char* msg){
@@ -305,8 +311,7 @@ void log_msg_die(char* msg){
 }	
 
 void log_err_die(int err_code){
-	char* msg=err2msg(err_code);
-        log_msg(msg);
+        log_err(err_code);
         log_msg("Exiting.");
 	exit(err_code);
 }
@@ -315,6 +320,11 @@ void log_err_die(int err_code){
 void log_err(int err_code){
 	char* msg=err2msg(err_code);
         log_msg(msg);
+}
+
+void set_log(int do_stderr, int do_file){
+        log_to_stderr=do_stderr;
+        log_to_file=do_file;
 }
 
 

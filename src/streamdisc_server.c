@@ -118,15 +118,26 @@ int main(int argc, char **argv)
 	static struct sockaddr_in serv_addr;            /* static = initialised to zeros */
         static struct streamdisc_http_request_s req;    /* static = initialised to zeros */
 
-	if( argc < 3  || argc > 3 || !strcmp(argv[1], "-?") ) {
-		(void)printf("Usage: streamdisc_server <port> <device>\n\n"
-	"\tExample: streamdisc_server 80 /dev/sr0\n\n"
-	"\tDaemonizes and returns pid of background process on success.\n"
+	if( argc < 3  || argc > 4 || !strcmp(argv[1], "--help") || !strcmp(argv[1], "-h") || !strcmp(argv[1], "-?") ) {
+		(void)printf("Usage: streamdisc_server <port> <device> [-b]\n\n"
+	"\tExample (foreground): streamdisc_server 80 /dev/sr0\n"
+	"\t\tLogs to stderr.\n\n"
+	
+        "\tExample (background): streamdisc_server 80 /dev/sr0 -b\n"
+	"\t\tOld-style daemon runs in background and logs to /var/log/streamdisc.log.\n\n"
 	"\tNo warranty given or implied.\n\n");
 		exit(0);
 	}
         
-        remove_log_file();
+        int background=0;
+        if( 4==argc && !strcmp(argv[3],"-b")){
+                background=1;
+                remove_log_file();
+        }
+        else {
+                set_log(1 /*log to stderr */,0 /*log to file */);
+        }
+
         /* check if device file is accessilbe */
         int test_fd=open(argv[2], O_RDONLY); 
 	if (test_fd == -1){
@@ -137,8 +148,7 @@ int main(int argc, char **argv)
         
 	port = atoi(argv[1]);
 	if(port <= 0 || port >60000){
-		(void)printf("Invalid port number specified (try 1->60000)\n");
-		exit(-1);
+		log_msg_die("Invalid port number specified (try 1->60000)");
         }
         
         /* setup the network socket */
@@ -160,10 +170,13 @@ int main(int argc, char **argv)
 	        log_msg_die("Error listening on network socket.");
 	}
         
-	/* Become deamon + unstoppable and no zombies children (= no wait()) */
-	pid=fork();
-	if(pid != 0){
-	        exit( pid ); /* parent returns to shell */
+        
+        if(background){	/* Become deamon + unstoppable and no zombies children (= no wait()) */
+	        pid=fork();
+	        if(pid != 0){
+	                exit( 0 ); /* parent returns to shell */
+	        }
+	        set_log(0 /*log to stderr */,1 /*log to file */);
 	}
         
         char* logbuf=malloc(128*sizeof(char));
@@ -171,12 +184,14 @@ int main(int argc, char **argv)
 	log_msg(logbuf);
 	free(logbuf);
 	
-	(void)signal(SIGCHLD, SIG_IGN); /* ignore child death */
-	(void)signal(SIGHUP, SIG_IGN);  /* ignore terminal hangups */
-	for(i=0;i<32768;i++){              /* close open files */
-	        if (i!=listenfd) (void)close(i);
-	}
-	(void)setpgrp();		/* break away from process group */
+	if(background){
+	        (void)signal(SIGCHLD, SIG_IGN); /* ignore child death */
+	        (void)signal(SIGHUP, SIG_IGN);  /* ignore terminal hangups */
+	        for(i=0;i<32768;i++){              /* close open files */
+	                if (i!=listenfd) (void)close(i);
+	        }
+	        (void)setpgrp();		/* break away from process group */
+        }
 
 	while(1){
 		length = sizeof(cli_addr);
@@ -193,7 +208,7 @@ int main(int argc, char **argv)
 		else if(0==pid) { 	/* child. interpret request and serve if possible */
 			(void)close(listenfd);
 			parse_request(socketfd,&req);
-			//log_request(&req);
+			log_request(&req);
 			(void)streamdisc_serve(socketfd, &req, argv[2]); /* do not care about return value */
 			(void)close(socketfd);
 			exit(0);
