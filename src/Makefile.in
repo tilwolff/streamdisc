@@ -262,9 +262,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # what flags you want to pass to the C compiler & linker
-AM_CFLAGS = -Wall `pkg-config --cflags libbluray` `pkg-config --cflags \
-	dvdread`
-AM_LDFLAGS = `pkg-config --libs libbluray` `pkg-config --libs dvdread`
+AM_CFLAGS = -Wall
 streamdisc_server_LDADD = readdisc.a streamdisc.a
 streamdisc_cgi_LDADD = readdisc.a streamdisc.a
 discinfo_LDADD = readdisc.a
