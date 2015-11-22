@@ -4063,13 +4063,12 @@ fi
 
 # Checks for libraries.
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DVDOpen in -ldvdread" >&5
-$as_echo_n "checking for DVDOpen in -ldvdread... " >&6; }
-if ${ac_cv_lib_dvdread_DVDOpen+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing DVDOpen" >&5
+$as_echo_n "checking for library containing DVDOpen... " >&6; }
+if ${ac_cv_search_DVDOpen+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-ldvdread  $LIBS"
+  ac_func_search_save_LIBS=$LIBS
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4088,24 +4087,38 @@ return DVDOpen ();
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_dvdread_DVDOpen=yes
-else
-  ac_cv_lib_dvdread_DVDOpen=no
+for ac_lib in '' dvdread dvdnav; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_DVDOpen=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+    conftest$ac_exeext
+  if ${ac_cv_search_DVDOpen+:} false; then :
+  break
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dvdread_DVDOpen" >&5
-$as_echo "$ac_cv_lib_dvdread_DVDOpen" >&6; }
-if test "x$ac_cv_lib_dvdread_DVDOpen" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBDVDREAD 1
-_ACEOF
+done
+if ${ac_cv_search_DVDOpen+:} false; then :
 
-  LIBS="-ldvdread $LIBS"
+else
+  ac_cv_search_DVDOpen=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_DVDOpen" >&5
+$as_echo "$ac_cv_search_DVDOpen" >&6; }
+ac_res=$ac_cv_search_DVDOpen
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
+else
+  as_fn_error $? "unable to find DVDOpen in dvdread or dvdnav library" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for bd_open in -lbluray" >&5
@@ -4552,7 +4565,7 @@ fi
 done
 
 
-for ac_header in arpa/inet.h fcntl.h inttypes.h stdlib.h string.h sys/socket.h unistd.h
+for ac_header in arpa/inet.h fcntl.h inttypes.h stdlib.h string.h sys/socket.h unistd.h dvdread/dvd_reader.h libbluray/bluray.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -4561,6 +4574,8 @@ if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
 #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
 
+else
+  as_fn_error $? "unable to find required headers" "$LINENO" 5
 fi
 
 done
