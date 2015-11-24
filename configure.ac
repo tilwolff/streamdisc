@@ -11,8 +11,11 @@ AC_PROG_CC
 AC_PROG_RANLIB
 
 # Checks for libraries.
-AC_SEARCH_LIBS(DVDOpen,[dvdread],,AC_MSG_ERROR([unable to find DVDOpen in libdvdread library]))
-AC_SEARCH_LIBS(bd_open,[bluray],,AC_MSG_ERROR([unable to find bd_open in libbluray library]))
+#AC_SEARCH_LIBS(DVDOpen,[dvdread],,AC_MSG_ERROR([unable to find DVDOpen in libdvdread library]))
+#AC_SEARCH_LIBS(bd_open,[bluray],,AC_MSG_ERROR([unable to find bd_open in libbluray library]))
+
+PKG_CHECK_MODULES(DVDREAD, dvdread)
+PKG_CHECK_MODULES(BLURAY, libbluray)
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h stdlib.h string.h sys/socket.h unistd.h dvdread/dvd_reader.h libbluray/bluray.h],,AC_MSG_ERROR([unable to find required headers]))
