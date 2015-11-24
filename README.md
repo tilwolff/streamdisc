@@ -16,10 +16,11 @@ Tiny linux server application making non-encrypted DVD and BD content available 
 
 ## Usage
 ### General
-- both _streamdisc_cgi_ and _streamdisc_server_ log to both _stderr_ and _/var/log/streamdisc.log_ (if that file is writable by the user).
+- both _streamdisc_server_ (if run in background) and _streamdisc_cgi_ log to both _stderr_ and _/var/log/streamdisc.log_ (if that file is writable by the user).
 
 ### standalone server
-- syntax: `streamdisc_server <port> <drive device file>`
+- syntax: `streamdisc_server <port> <drive device file>` for running in foreground or if run by systemd
+- syntax: `streamdisc_server <port> <drive device file> -b` for running in background (old-style daemon)
 - example: `./streamdisc_server 80 /dev/sr0`
 - make sure you have sufficient privileges to access the disc drive and port
 - access disc

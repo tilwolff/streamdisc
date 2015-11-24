@@ -4087,7 +4087,7 @@ return DVDOpen ();
   return 0;
 }
 _ACEOF
-for ac_lib in '' dvdread dvdnav; do
+for ac_lib in '' dvdread; do
   if test -z "$ac_lib"; then
     ac_res="none required"
   else
@@ -4118,16 +4118,15 @@ if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
 else
-  as_fn_error $? "unable to find DVDOpen in dvdread or dvdnav library" "$LINENO" 5
+  as_fn_error $? "unable to find DVDOpen in libdvdread library" "$LINENO" 5
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for bd_open in -lbluray" >&5
-$as_echo_n "checking for bd_open in -lbluray... " >&6; }
-if ${ac_cv_lib_bluray_bd_open+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing bd_open" >&5
+$as_echo_n "checking for library containing bd_open... " >&6; }
+if ${ac_cv_search_bd_open+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lbluray  $LIBS"
+  ac_func_search_save_LIBS=$LIBS
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4146,24 +4145,38 @@ return bd_open ();
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_bluray_bd_open=yes
-else
-  ac_cv_lib_bluray_bd_open=no
+for ac_lib in '' bluray; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_bd_open=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+    conftest$ac_exeext
+  if ${ac_cv_search_bd_open+:} false; then :
+  break
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_bluray_bd_open" >&5
-$as_echo "$ac_cv_lib_bluray_bd_open" >&6; }
-if test "x$ac_cv_lib_bluray_bd_open" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBBLURAY 1
-_ACEOF
+done
+if ${ac_cv_search_bd_open+:} false; then :
 
-  LIBS="-lbluray $LIBS"
+else
+  ac_cv_search_bd_open=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_bd_open" >&5
+$as_echo "$ac_cv_search_bd_open" >&6; }
+ac_res=$ac_cv_search_bd_open
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
+else
+  as_fn_error $? "unable to find bd_open in libbluray library" "$LINENO" 5
 fi
 
 
