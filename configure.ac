@@ -18,7 +18,7 @@ PKG_CHECK_MODULES(DVDREAD, dvdread)
 PKG_CHECK_MODULES(BLURAY, libbluray)
 
 # Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h stdlib.h string.h sys/socket.h unistd.h dvdread/dvd_reader.h libbluray/bluray.h],,AC_MSG_ERROR([unable to find required headers]))
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h stdlib.h string.h sys/socket.h unistd.h],,AC_MSG_ERROR([unable to find required headers]))
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_INT32_T
