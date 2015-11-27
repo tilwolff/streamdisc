@@ -90,40 +90,29 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
-AR = ar
-ARFLAGS = cru
-AM_V_AR = $(am__v_AR_@AM_V@)
-am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
-am__v_AR_0 = @echo "  AR      " $@;
-am__v_AR_1 = 
-readdisc_a_AR = $(AR) $(ARFLAGS)
-readdisc_a_LIBADD =
-readdisc_a_SOURCES = readdisc.c
-readdisc_a_OBJECTS = readdisc.$(OBJEXT)
-streamdisc_a_AR = $(AR) $(ARFLAGS)
-streamdisc_a_LIBADD =
-streamdisc_a_SOURCES = streamdisc.c
-streamdisc_a_OBJECTS = streamdisc.$(OBJEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-discinfo_SOURCES = discinfo.c
-discinfo_OBJECTS = discinfo-discinfo.$(OBJEXT)
+am_discinfo_OBJECTS = discinfo-readdisc.$(OBJEXT) \
+	discinfo-discinfo.$(OBJEXT)
+discinfo_OBJECTS = $(am_discinfo_OBJECTS)
 am__DEPENDENCIES_1 =
-discinfo_DEPENDENCIES = readdisc.a $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+discinfo_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 discinfo_LINK = $(CCLD) $(discinfo_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-streamdisc_cgi_SOURCES = streamdisc_cgi.c
-streamdisc_cgi_OBJECTS = streamdisc_cgi-streamdisc_cgi.$(OBJEXT)
-streamdisc_cgi_DEPENDENCIES = readdisc.a streamdisc.a \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_streamdisc_cgi_OBJECTS = streamdisc_cgi-readdisc.$(OBJEXT) \
+	streamdisc_cgi-streamdisc.$(OBJEXT) \
+	streamdisc_cgi-streamdisc_cgi.$(OBJEXT)
+streamdisc_cgi_OBJECTS = $(am_streamdisc_cgi_OBJECTS)
+streamdisc_cgi_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 streamdisc_cgi_LINK = $(CCLD) $(streamdisc_cgi_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-streamdisc_server_SOURCES = streamdisc_server.c
-streamdisc_server_OBJECTS =  \
+am_streamdisc_server_OBJECTS = streamdisc_server-readdisc.$(OBJEXT) \
+	streamdisc_server-streamdisc.$(OBJEXT) \
 	streamdisc_server-streamdisc_server.$(OBJEXT)
-streamdisc_server_DEPENDENCIES = readdisc.a streamdisc.a \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+streamdisc_server_OBJECTS = $(am_streamdisc_server_OBJECTS)
+streamdisc_server_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 streamdisc_server_LINK = $(CCLD) $(streamdisc_server_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -158,10 +147,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = readdisc.c streamdisc.c discinfo.c streamdisc_cgi.c \
-	streamdisc_server.c
-DIST_SOURCES = readdisc.c streamdisc.c discinfo.c streamdisc_cgi.c \
-	streamdisc_server.c
+SOURCES = $(discinfo_SOURCES) $(streamdisc_cgi_SOURCES) \
+	$(streamdisc_server_SOURCES)
+DIST_SOURCES = $(discinfo_SOURCES) $(streamdisc_cgi_SOURCES) \
+	$(streamdisc_server_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -285,13 +274,16 @@ top_srcdir = @top_srcdir@
 
 # what flags you want to pass to the C compiler & linker
 AM_CFLAGS = -Wall
+streamdisc_server_SOURCES = readdisc.c streamdisc.c streamdisc_server.c
+streamdisc_cgi_SOURCES = readdisc.c streamdisc.c streamdisc_cgi.c
+discinfo_SOURCES = readdisc.c discinfo.c
 streamdisc_server_CFLAGS = $(BLURAY_CFLAGS) $(DVDREAD_CFLAGS)
 streamdisc_cgi_CFLAGS = $(BLURAY_CFLAGS) $(DVDREAD_CFLAGS)
 discinfo_CFLAGS = $(BLURAY_CFLAGS) $(DVDREAD_CFLAGS)
-streamdisc_server_LDADD = readdisc.a streamdisc.a $(BLURAY_LIBS) $(DVDREAD_LIBS)
-streamdisc_cgi_LDADD = readdisc.a streamdisc.a $(BLURAY_LIBS) $(DVDREAD_LIBS)
-discinfo_LDADD = readdisc.a $(BLURAY_LIBS) $(DVDREAD_LIBS)
-noinst_LIBRARIES = readdisc.a streamdisc.a
+streamdisc_server_LDADD = $(BLURAY_LIBS) $(DVDREAD_LIBS)
+streamdisc_cgi_LDADD = $(BLURAY_LIBS) $(DVDREAD_LIBS)
+discinfo_LDADD = $(BLURAY_LIBS) $(DVDREAD_LIBS)
+noinst_LIBRARIES = 
 all: all-am
 
 .SUFFIXES:
@@ -329,16 +321,6 @@ $(am__aclocal_m4_deps):
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-
-readdisc.a: $(readdisc_a_OBJECTS) $(readdisc_a_DEPENDENCIES) $(EXTRA_readdisc_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f readdisc.a
-	$(AM_V_AR)$(readdisc_a_AR) readdisc.a $(readdisc_a_OBJECTS) $(readdisc_a_LIBADD)
-	$(AM_V_at)$(RANLIB) readdisc.a
-
-streamdisc.a: $(streamdisc_a_OBJECTS) $(streamdisc_a_DEPENDENCIES) $(EXTRA_streamdisc_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f streamdisc.a
-	$(AM_V_AR)$(streamdisc_a_AR) streamdisc.a $(streamdisc_a_OBJECTS) $(streamdisc_a_LIBADD)
-	$(AM_V_at)$(RANLIB) streamdisc.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -401,9 +383,12 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/discinfo-discinfo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readdisc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamdisc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/discinfo-readdisc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamdisc_cgi-readdisc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamdisc_cgi-streamdisc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamdisc_cgi-streamdisc_cgi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamdisc_server-readdisc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamdisc_server-streamdisc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamdisc_server-streamdisc_server.Po@am__quote@
 
 .c.o:
@@ -420,6 +405,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
+discinfo-readdisc.o: readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(discinfo_CFLAGS) $(CFLAGS) -MT discinfo-readdisc.o -MD -MP -MF $(DEPDIR)/discinfo-readdisc.Tpo -c -o discinfo-readdisc.o `test -f 'readdisc.c' || echo '$(srcdir)/'`readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/discinfo-readdisc.Tpo $(DEPDIR)/discinfo-readdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readdisc.c' object='discinfo-readdisc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(discinfo_CFLAGS) $(CFLAGS) -c -o discinfo-readdisc.o `test -f 'readdisc.c' || echo '$(srcdir)/'`readdisc.c
+
+discinfo-readdisc.obj: readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(discinfo_CFLAGS) $(CFLAGS) -MT discinfo-readdisc.obj -MD -MP -MF $(DEPDIR)/discinfo-readdisc.Tpo -c -o discinfo-readdisc.obj `if test -f 'readdisc.c'; then $(CYGPATH_W) 'readdisc.c'; else $(CYGPATH_W) '$(srcdir)/readdisc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/discinfo-readdisc.Tpo $(DEPDIR)/discinfo-readdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readdisc.c' object='discinfo-readdisc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(discinfo_CFLAGS) $(CFLAGS) -c -o discinfo-readdisc.obj `if test -f 'readdisc.c'; then $(CYGPATH_W) 'readdisc.c'; else $(CYGPATH_W) '$(srcdir)/readdisc.c'; fi`
+
 discinfo-discinfo.o: discinfo.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(discinfo_CFLAGS) $(CFLAGS) -MT discinfo-discinfo.o -MD -MP -MF $(DEPDIR)/discinfo-discinfo.Tpo -c -o discinfo-discinfo.o `test -f 'discinfo.c' || echo '$(srcdir)/'`discinfo.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/discinfo-discinfo.Tpo $(DEPDIR)/discinfo-discinfo.Po
@@ -434,6 +433,34 @@ discinfo-discinfo.obj: discinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(discinfo_CFLAGS) $(CFLAGS) -c -o discinfo-discinfo.obj `if test -f 'discinfo.c'; then $(CYGPATH_W) 'discinfo.c'; else $(CYGPATH_W) '$(srcdir)/discinfo.c'; fi`
 
+streamdisc_cgi-readdisc.o: readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -MT streamdisc_cgi-readdisc.o -MD -MP -MF $(DEPDIR)/streamdisc_cgi-readdisc.Tpo -c -o streamdisc_cgi-readdisc.o `test -f 'readdisc.c' || echo '$(srcdir)/'`readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_cgi-readdisc.Tpo $(DEPDIR)/streamdisc_cgi-readdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readdisc.c' object='streamdisc_cgi-readdisc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -c -o streamdisc_cgi-readdisc.o `test -f 'readdisc.c' || echo '$(srcdir)/'`readdisc.c
+
+streamdisc_cgi-readdisc.obj: readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -MT streamdisc_cgi-readdisc.obj -MD -MP -MF $(DEPDIR)/streamdisc_cgi-readdisc.Tpo -c -o streamdisc_cgi-readdisc.obj `if test -f 'readdisc.c'; then $(CYGPATH_W) 'readdisc.c'; else $(CYGPATH_W) '$(srcdir)/readdisc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_cgi-readdisc.Tpo $(DEPDIR)/streamdisc_cgi-readdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readdisc.c' object='streamdisc_cgi-readdisc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -c -o streamdisc_cgi-readdisc.obj `if test -f 'readdisc.c'; then $(CYGPATH_W) 'readdisc.c'; else $(CYGPATH_W) '$(srcdir)/readdisc.c'; fi`
+
+streamdisc_cgi-streamdisc.o: streamdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -MT streamdisc_cgi-streamdisc.o -MD -MP -MF $(DEPDIR)/streamdisc_cgi-streamdisc.Tpo -c -o streamdisc_cgi-streamdisc.o `test -f 'streamdisc.c' || echo '$(srcdir)/'`streamdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_cgi-streamdisc.Tpo $(DEPDIR)/streamdisc_cgi-streamdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='streamdisc.c' object='streamdisc_cgi-streamdisc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -c -o streamdisc_cgi-streamdisc.o `test -f 'streamdisc.c' || echo '$(srcdir)/'`streamdisc.c
+
+streamdisc_cgi-streamdisc.obj: streamdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -MT streamdisc_cgi-streamdisc.obj -MD -MP -MF $(DEPDIR)/streamdisc_cgi-streamdisc.Tpo -c -o streamdisc_cgi-streamdisc.obj `if test -f 'streamdisc.c'; then $(CYGPATH_W) 'streamdisc.c'; else $(CYGPATH_W) '$(srcdir)/streamdisc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_cgi-streamdisc.Tpo $(DEPDIR)/streamdisc_cgi-streamdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='streamdisc.c' object='streamdisc_cgi-streamdisc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -c -o streamdisc_cgi-streamdisc.obj `if test -f 'streamdisc.c'; then $(CYGPATH_W) 'streamdisc.c'; else $(CYGPATH_W) '$(srcdir)/streamdisc.c'; fi`
+
 streamdisc_cgi-streamdisc_cgi.o: streamdisc_cgi.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -MT streamdisc_cgi-streamdisc_cgi.o -MD -MP -MF $(DEPDIR)/streamdisc_cgi-streamdisc_cgi.Tpo -c -o streamdisc_cgi-streamdisc_cgi.o `test -f 'streamdisc_cgi.c' || echo '$(srcdir)/'`streamdisc_cgi.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_cgi-streamdisc_cgi.Tpo $(DEPDIR)/streamdisc_cgi-streamdisc_cgi.Po
@@ -447,6 +474,34 @@ streamdisc_cgi-streamdisc_cgi.obj: streamdisc_cgi.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='streamdisc_cgi.c' object='streamdisc_cgi-streamdisc_cgi.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_cgi_CFLAGS) $(CFLAGS) -c -o streamdisc_cgi-streamdisc_cgi.obj `if test -f 'streamdisc_cgi.c'; then $(CYGPATH_W) 'streamdisc_cgi.c'; else $(CYGPATH_W) '$(srcdir)/streamdisc_cgi.c'; fi`
+
+streamdisc_server-readdisc.o: readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -MT streamdisc_server-readdisc.o -MD -MP -MF $(DEPDIR)/streamdisc_server-readdisc.Tpo -c -o streamdisc_server-readdisc.o `test -f 'readdisc.c' || echo '$(srcdir)/'`readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_server-readdisc.Tpo $(DEPDIR)/streamdisc_server-readdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readdisc.c' object='streamdisc_server-readdisc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -c -o streamdisc_server-readdisc.o `test -f 'readdisc.c' || echo '$(srcdir)/'`readdisc.c
+
+streamdisc_server-readdisc.obj: readdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -MT streamdisc_server-readdisc.obj -MD -MP -MF $(DEPDIR)/streamdisc_server-readdisc.Tpo -c -o streamdisc_server-readdisc.obj `if test -f 'readdisc.c'; then $(CYGPATH_W) 'readdisc.c'; else $(CYGPATH_W) '$(srcdir)/readdisc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_server-readdisc.Tpo $(DEPDIR)/streamdisc_server-readdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='readdisc.c' object='streamdisc_server-readdisc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -c -o streamdisc_server-readdisc.obj `if test -f 'readdisc.c'; then $(CYGPATH_W) 'readdisc.c'; else $(CYGPATH_W) '$(srcdir)/readdisc.c'; fi`
+
+streamdisc_server-streamdisc.o: streamdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -MT streamdisc_server-streamdisc.o -MD -MP -MF $(DEPDIR)/streamdisc_server-streamdisc.Tpo -c -o streamdisc_server-streamdisc.o `test -f 'streamdisc.c' || echo '$(srcdir)/'`streamdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_server-streamdisc.Tpo $(DEPDIR)/streamdisc_server-streamdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='streamdisc.c' object='streamdisc_server-streamdisc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -c -o streamdisc_server-streamdisc.o `test -f 'streamdisc.c' || echo '$(srcdir)/'`streamdisc.c
+
+streamdisc_server-streamdisc.obj: streamdisc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -MT streamdisc_server-streamdisc.obj -MD -MP -MF $(DEPDIR)/streamdisc_server-streamdisc.Tpo -c -o streamdisc_server-streamdisc.obj `if test -f 'streamdisc.c'; then $(CYGPATH_W) 'streamdisc.c'; else $(CYGPATH_W) '$(srcdir)/streamdisc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/streamdisc_server-streamdisc.Tpo $(DEPDIR)/streamdisc_server-streamdisc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='streamdisc.c' object='streamdisc_server-streamdisc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -c -o streamdisc_server-streamdisc.obj `if test -f 'streamdisc.c'; then $(CYGPATH_W) 'streamdisc.c'; else $(CYGPATH_W) '$(srcdir)/streamdisc.c'; fi`
 
 streamdisc_server-streamdisc_server.o: streamdisc_server.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(streamdisc_server_CFLAGS) $(CFLAGS) -MT streamdisc_server-streamdisc_server.o -MD -MP -MF $(DEPDIR)/streamdisc_server-streamdisc_server.Tpo -c -o streamdisc_server-streamdisc_server.o `test -f 'streamdisc_server.c' || echo '$(srcdir)/'`streamdisc_server.c
