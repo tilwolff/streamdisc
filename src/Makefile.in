@@ -108,13 +108,16 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 discinfo_SOURCES = discinfo.c
 discinfo_OBJECTS = discinfo.$(OBJEXT)
-discinfo_DEPENDENCIES = readdisc.a
+am__DEPENDENCIES_1 =
+discinfo_DEPENDENCIES = readdisc.a $(am__DEPENDENCIES_1)
 streamdisc_cgi_SOURCES = streamdisc_cgi.c
 streamdisc_cgi_OBJECTS = streamdisc_cgi.$(OBJEXT)
-streamdisc_cgi_DEPENDENCIES = readdisc.a streamdisc.a
+streamdisc_cgi_DEPENDENCIES = readdisc.a streamdisc.a \
+	$(am__DEPENDENCIES_1)
 streamdisc_server_SOURCES = streamdisc_server.c
 streamdisc_server_OBJECTS = streamdisc_server.$(OBJEXT)
-streamdisc_server_DEPENDENCIES = readdisc.a streamdisc.a
+streamdisc_server_DEPENDENCIES = readdisc.a streamdisc.a \
+	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -269,10 +272,10 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # what flags you want to pass to the C compiler & linker
-AM_CFLAGS = -Wall
-streamdisc_server_LDADD = readdisc.a streamdisc.a
-streamdisc_cgi_LDADD = readdisc.a streamdisc.a
-discinfo_LDADD = readdisc.a
+AM_CFLAGS = -Wall $(DVDREAD_CFLAGS) $(BLURAY_CFLAGS)
+streamdisc_server_LDADD = readdisc.a streamdisc.a $(BLURAY_LIBS) $(DVD_LIBS)
+streamdisc_cgi_LDADD = readdisc.a streamdisc.a $(BLURAY_LIBS) $(DVD_LIBS)
+discinfo_LDADD = readdisc.a $(BLURAY_LIBS) $(DVD_LIBS)
 noinst_LIBRARIES = readdisc.a streamdisc.a
 all: all-am
 
