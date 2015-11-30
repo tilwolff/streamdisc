@@ -31,8 +31,6 @@ AC_TYPE_UINT64_T
 
 # Checks for library functions.
 AC_FUNC_FORK
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
 AC_CHECK_FUNCS([socket strdup strtoull])
 
 AC_OUTPUT(Makefile src/Makefile)
